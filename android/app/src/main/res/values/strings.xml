@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">VitalReact</string>
+    <string name="facebook_app_id">2087770414568175</string>
+    <string name="fb_login_protocol_scheme">fb2087770414568175</string>
+</resources>
