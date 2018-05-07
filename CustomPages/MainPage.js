@@ -19,6 +19,8 @@ import RNGooglePlaces from 'react-native-google-places';
 
 
 
+
+
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
@@ -109,7 +111,7 @@ class MainPage extends Component{
   openSearchModal(navigate){
     if (this.state.locatingMethod==1)
     {
-      RNGooglePlaces.openAutocompleteModal().then((place)=>{
+      RNGooglePlaces.openAutocompleteModal({country: 'VN'}).then((place)=>{
         //console.log(place);
         this.props.retrieveAddress({address: place.name});
         this.props.coordinateRetrieve({coordinates:{
@@ -124,6 +126,19 @@ class MainPage extends Component{
 
   }
   renderPendingDialog(){
+    setTimeout(()=>{
+      firebase.database().ref(`OnlineUsers/${this.props.usrId}/status`).on('value',snapshot=>{
+        if (snapshot.val()=='pending') {
+          this.setState({
+            pending: false,
+            none: true
+          });
+          firebase.database().ref(`OnlineUsers/${this.props.usrId}`).update({
+            status: 'online'
+          });
+        }
+      })
+    }, 30000)
     return(
       <View style={styles.darkFade}>
         <PendingDialog />
@@ -208,7 +223,7 @@ class MainPage extends Component{
 
         <CustomMapView/>
         <HideWithKeyboard style={{height:'20%'}}>
-          <TopBar onPress={()=>{navigate('DrawerOpen')}}/>
+          <TopBar onRightPress={()=>{navigate('Profile')}} onPress={()=>{navigate('DrawerOpen')}}/>
         </HideWithKeyboard>
         <View style={{backgroundColor:'white', borderRadius: 5, elevation: 10, flexGrow: 1, marginTop:'17%', flexDirection:'row', alignItems:'center', justifyContent:'space-between', marginRight:'5%', height: '20%', marginLeft:'5%'}}>
           <Image ref ={image=> this.image=image} onLayout={(event)=>{

@@ -78,7 +78,10 @@ class TopBar extends Component{
             <Icon name={accident_icons[accident_icons[this.props.accident]?this.props.accident:'other']} size={25} color='#d35400'/>
           </View>
         </TouchableOpacity>
-        <View style={{flex: 3}}/>
+        <View style={{flex: 2}}/>
+        <TouchableOpacity style={{flex: 1,alignItems:'center', justifyContent: 'center'}} onPress={this.props.onRightPress}>
+          <Icon name={"user"} size={30} color="#fff" />
+        </TouchableOpacity>
       </View>
     )
   }
@@ -131,6 +134,7 @@ class TopBar extends Component{
                                 buttonOuterSize={30}
                                 buttonInnerColor='#e67e22'/>
                 <RadioButtonLabel obj={param}
+                                  onPress={()=>{}}
                                   index={value}
                                   labelWrapStyle={{marginTop: 5, justifyContent:'center', backgroundColor:'#ecf0f1', alignItems:'center', borderRadius: 10}}
                                   labelStyle={{fontSize:15, margin: 2, marginLeft:5, marginRight:5, color: '#34495e', fontFamily:'helveticaneuelightitalic'}}/>
@@ -151,7 +155,7 @@ class TopBar extends Component{
   }
 
   render(){
-    const {onPress} = this.props;
+    const {onPress, onRightPress} = this.props;
     return (
       <View>
         {!this.state.accidentRadio&&this.renderDefaultTopBar()}
@@ -170,6 +174,7 @@ function mapDispatchToProps(dispatch){
   return Object.assign({},LogInAction,PoppingAction);
 }
 TopBar.PropTypes={
-  onPress: PropTypes.func.isRequired
+  onPress: PropTypes.func.isRequired,
+  onRightPress: PropTypes.func.isRequired
 }
 export default connect(mapStateToProps, mapDispatchToProps)(TopBar);

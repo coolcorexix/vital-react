@@ -20,6 +20,7 @@ export default function userReducer(state={
     case "RETRIEVE_USER_PHONE":
     {
       state.isOnline = true;
+      state.info.id = action.payload;
       state.info.phone = action.payload;
       return state;
     }

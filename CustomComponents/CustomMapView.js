@@ -283,7 +283,7 @@ class CustomMapView extends Component {
           });
         },
       (error) => alert('Không thể xác định vị trí hiện tại'),
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 10000, DistanceFilter: 50 },
+      { timeout: 20000, maximumAge: 10000, DistanceFilter: 50 },
       );
       // this.watchID = navigator.geolocation.watchPosition(
       //   position => {
@@ -327,7 +327,7 @@ class CustomMapView extends Component {
             {this.props.saviorMarkerSource.map(savior=>(
                 <MapView.Marker coordinate = {{longitude: savior.coordinates.long, latitude: savior.coordinates.lat}}>
                   <View style={{flex:1}}>
-                    <Image style={{width:30, height:30}} source={require('../image-res/wrench48.png')}/>
+                    <Image style={{width:30, height:30}} source={require('../image-res/reflector-vest64.png')}/>
                   </View>
                 </MapView.Marker>
             ))}

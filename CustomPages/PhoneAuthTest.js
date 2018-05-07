@@ -118,7 +118,6 @@ class PhoneAuthTest extends Component {
         <Button title="Confirm Code" color="#841584" onPress={()=>{
               this.confirmCode(()=>{navigate('Profile')});
         }} />
-        <Button title='test' onPress={()=>{navigate('Welcome')}}/>
       </View>
     );
   }

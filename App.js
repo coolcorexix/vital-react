@@ -29,6 +29,7 @@ import ProfilePage from './CustomPages/ProfilePage'
 import SideBar from './CustomComponents/SideBar'
 import PhoneAuthTest from './CustomPages/PhoneAuthTest'
 import StaticPickerMapView from './CustomComponents/StaticPickerMapView';
+import { NavigationActions } from 'react-navigation';
 
 
 const styles = StyleSheet.create({
@@ -75,6 +76,17 @@ export default class App extends Component {
         navigationOptions: ({navigation}) => ({
           header: null})
       });
+      //|| state.routes[state.index].routeName === 'Profile'
+    const prevGetStateForAction = MainStack.router.getStateForAction;
+    MainStack.router.getStateForAction = (action, state)=>{
+      if (action.type === 'Navigation/BACK' && state && (state.routes[state.index].routeName === 'Main'))
+      {
+        console.log(state);
+        return prevGetStateForAction({...action, type: NavigationActions.reset},state);
+      }
+
+      return prevGetStateForAction(action, state);
+    }
 
     return (
       <Provider store={store}>

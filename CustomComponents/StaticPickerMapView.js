@@ -274,7 +274,7 @@ class StaticPickerMapView extends Component{
     const {navigate} = this.props.navigation;
     return(
       <View style={styles.container}>
-        <MapView initialRegion={this.props.prevChosenLocation?Object.assign({},this.props.prevChosenLocation,
+        <MapView initialRegion={(this.props.prevChosenLocation.longitude!=undefined)?Object.assign({},this.props.prevChosenLocation,
                {latitudeDelta: LATITUDE_DELTA,
                 longitudeDelta: LONGITUDE_DELTA}):this.state.currentPos}
         onRegionChangeComplete={(region)=>{
