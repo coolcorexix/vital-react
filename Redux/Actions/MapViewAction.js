@@ -5,6 +5,13 @@ export function retrieveAddress(data){
         }, 1);
   }
 }
+export function disableGetCurrentPosition(){
+  return (dispatch)=>{
+    setTimeout(()=>{
+      dispatch({type: "GETCUR_DISABLE", payload: null});
+    }, 1);
+  }
+}
 export function coordinateRetrieve(data){
   return (dispatch)=>{
     setTimeout(() => {

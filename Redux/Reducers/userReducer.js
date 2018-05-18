@@ -1,4 +1,5 @@
 export default function userReducer(state={
+  radius: 20,
   isOnline: false,
   info: {
     id: " ",
@@ -10,6 +11,12 @@ export default function userReducer(state={
   accident: "wheel"
 }, action){
   switch (action.type) {
+    case "REQUEST_RADIUS":
+    {
+      state.radius = action.payload;
+      return state;
+    }
+      break;
     case "UPDATE_USER":
     {
       state.info.name = action.payload.info.name;

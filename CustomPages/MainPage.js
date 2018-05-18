@@ -3,6 +3,7 @@ import {Text, Image, TextInput, Button, StyleSheet, View, TouchableHighlight, To
 import CustomMapView from '../CustomComponents/CustomMapView';
 import CustomButton from '../CustomComponents/CustomButton';
 import PendingDialog from '../CustomComponents/PendingDialog';
+import FinishDialog from '../CustomComponents/FinishDialog';
 import UserInfoDisplay from '../CustomComponents/UserInfoDisplay';
 import TopBar from '../CustomComponents/TopBar';
 import firebase from '../Firebase/config/firebase';
@@ -88,13 +89,16 @@ class MainPage extends Component{
   constructor(props){
     super(props);
     this.state={
+      saviorData: undefined,
       otherValue: ' ',
       locatingMethod: 1,
       pending: false,
+      enableCanceling: false,
       accepted: false,
       actionButtonX: 0,
       actionButtonY: 0,
-      none: false
+      none: false,
+      finished: false
     };
   }
   componentDidMount(){
@@ -125,20 +129,58 @@ class MainPage extends Component{
     }
 
   }
+  renderFireRequestButton(navigate){
+    return (
+      <CustomButton fontFamily="helveticaneuecondensedbold"
+      text="BẮN PHÁO SÁNG" colorPress='#c0392b'
+      onPress={()=>{sendRequestDetailToDb({...this.props.usrFullReq, address: this.props.address,  status: "unsolved"}, this.props.usrId, navigate, this.props.findNearby, this)}}
+      colorUnpress='#e74c3c' />
+    )
+  }
+  renderCancelButton(){
+    return (
+      <CustomButton colorPress='#2980b9' colorUnpress='#3498db' fontFamily="helveticaneuecondensedbold" onPress={()=>{
+        firebase.database().ref('OnlineUsers/' + this.props.usrId).update({status: 'online'});
+        firebase.database().ref('OnlineSavior/'+ this.state.saviorData).update({status:'canceled'});
+        this.setState({
+          enableCanceling: false
+        })
+      }} text="HỦY"/>
+    )
+  }
+  renderFinishDialog(){
+    return (
+      <FinishDialog onPress={()=>{
+        this.setState({
+          finished: false,
+          enableCanceling: false
+        });
+        firebase.database().ref('OnlineUsers/'+this.props.usrId).update({status: 'online'});
+      }}/>
+    )
+  }
   renderPendingDialog(){
     setTimeout(()=>{
-      firebase.database().ref(`OnlineUsers/${this.props.usrId}/status`).on('value',snapshot=>{
+      firebase.database().ref(`OnlineUsers/${this.props.usrId}/status`).once('value',snapshot=>{
         if (snapshot.val()=='pending') {
           this.setState({
             pending: false,
             none: true
           });
+          firebase.database().ref(`OnlineUsers/${this.props.usrId}`).off();
           firebase.database().ref(`OnlineUsers/${this.props.usrId}`).update({
             status: 'online'
           });
         }
       })
-    }, 30000)
+    }, 30000);
+    firebase.database().ref(`OnlineUsers/${this.props.usrId}/saviorPhone`).on('value',snapshot=>{
+      if (snapshot.val()!=null){
+        this.setState({
+          saviorData: snapshot.val()
+        })
+      }
+    })
     return(
       <View style={styles.darkFade}>
         <PendingDialog />
@@ -191,12 +233,13 @@ class MainPage extends Component{
     return (
       <View style={styles.darkFade}>
         <View style={styles.acceptDialog}>
-          <Text>Cứu hộ đang trên đường</Text>
+          <Text style={{fontFamily:'helveticaneuecondensedbold', fontSize: 15, color: 'black'}}>Cứu hộ đang trên đường</Text>
           <Animated.View  style={{transform:[{scale:springHeartValue}]}}>
             <Icon name='heart' size={80} color='#e74c3c'/>
           </Animated.View>
-
+          <Text style={{fontFamily:'helveticaneuelightitalic', color: 'black',fontSize:12}}>Số điện thoại: {this.state.saviorData}</Text>
           <Button onPress={()=>{this.setState({
+            enableCanceling: true,
             accepted: false
           });
           firebase.database().ref(`OnlineUsers/${this.props.usrId}/status`).set('waiting')}}
@@ -234,14 +277,16 @@ class MainPage extends Component{
               })
             });
           }} style={[styles.image,{marginLeft:10}]} source={require('../image-res/fearfulFace.png')}/>
-          <TouchableOpacity style={{justifyContent:'center',  borderBottomColor: '#bbb',
+          <TouchableOpacity ref={ref=>this.toucha = ref} style={{justifyContent:'center',  borderBottomColor: '#bbb',
           borderBottomWidth: StyleSheet.hairlineWidth, alignItems: 'center', margin: '5%',
            marginLeft:'10%', width:'80%'}} onPress={()=>this.openSearchModal(navigate)}>
             <Text style={{textAlign: 'center', fontSize:20, fontFamily:'helveticaneue'}}>{this.props.address}</Text>
           </TouchableOpacity>
         </View>
         <View style={{flex: 8}}/>
-        <CustomButton fontFamily="helveticaneuecondensedbold" text="BẮN PHÁO SÁNG" colorPress='#c0392b' onPress={()=>{sendRequestDetailToDb({...this.props.usrFullReq, status: "unsolved"}, this.props.usrId, navigate, this.props.findNearby, this)}} colorUnpress='#e74c3c' />
+        {!this.state.enableCanceling && this.renderFireRequestButton(navigate)}
+        {this.state.enableCanceling && this.renderCancelButton()}
+
         <ActionButton position='left' size={40} offsetX={this.state.actionButtonX} offsetY={this.state.actionButtonY} style={{elevation: 10, flex:1, position:'absolute'}} verticalOrientation="down" buttonColor="#e74c3c"
         renderIcon ={(active)=>{
           if (this.state.locatingMethod == 1)
@@ -275,6 +320,7 @@ class MainPage extends Component{
         {this.state.accepted&&this.renderAcceptDialog()}
         {this.state.none&&this.renderSadlyDialog()}
         {this.props.otherDialog&&this.renderOtherDialog()}
+        {this.state.finished&&this.renderFinishDialog()}
       </View>
     )
   }
@@ -290,16 +336,18 @@ function sendRequestDetailToDb(data, id, navigate, func, obj){
   saviorCollection.once('value').then((snapshot)=>{
     for (var k in snapshot.val()){
       //console.log('play', k);
-      var tempDist= GeoFire.distance([data.coordinates['latitude'], data.coordinates['longitude']], [snapshot.val()[k].coordinates['lat'], snapshot.val()[k].coordinates['long']]);
+      var tempDist= GeoFire.distance([data.coordinates['latitude'], data.coordinates['longitude']], [snapshot.val()[k].coordinate['lat'], snapshot.val()[k].coordinate['long']]);
       //console.log(tempDist);
-      if (tempDist < 100)
+      if (tempDist <= obj.props.radius)
       {
         //console.log(snapshot.key[k]);
-        availableSaviors.push(snapshot.val()[k]);
-        console.log('in process', k);
-        firebase.database().ref(`OnlineSavior/${k}/Victim`).set({
-          fullDetails: data
-        });
+        if(snapshot.val()[k].status!=='busy')
+        {
+          availableSaviors.push(snapshot.val()[k]);
+          firebase.database().ref(`OnlineSavior/${k}/Victim`).set({
+            fullDetails: data
+          });
+        }
       }
     }
     //console.log(JSON.stringify(availableSaviors));
@@ -329,7 +377,17 @@ function sendRequestDetailToDb(data, id, navigate, func, obj){
         obj.setState({
           pending: false,
           accepted: true
-        })
+        });
+        firebase.database().ref('OnlineUsers/' + obj.props.usrId+'/status').on('value', snapshot=>{
+
+          if (snapshot.val()== 'finished')
+          {
+            obj.setState({
+              accepted: false,
+              finished: true
+            })
+          }
+        });
       }
     })
   });
@@ -345,7 +403,8 @@ function mapStateToProps(state){
     avaURL: state.userReducer.info.avaURL,
     address: state.addressReducer.address,
     usrFullReq: state.userReducer,
-    chosenLocation: state.coordinatesReducer
+    chosenLocation: state.coordinatesReducer,
+    radius: state.userReducer.radius
   }
 }
 function mapDispatchToProps(dispatch){

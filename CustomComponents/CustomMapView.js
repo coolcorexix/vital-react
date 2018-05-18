@@ -256,35 +256,39 @@ class CustomMapView extends Component {
     const granted = await this.requestLocationPermission();
     if (granted == true)
     {
-      navigator.geolocation.getCurrentPosition(
-        position => {
+      if (this.props.autoUpdatePostion)
+      {
+        navigator.geolocation.getCurrentPosition(
+          position => {
 
-          Geocoder.getFromLatLng(position.coords.latitude, position.coords.longitude).then(
-            json => {
-              var street_number = json.results[0].address_components[0];
-              var route = json.results[0].address_components[1];
-              this.props.retrieveAddress({address: street_number.long_name + " " + route.long_name})
-            },
-            error => {
-              alert(error);
-            }
-          );
-          this.props.coordinateRetrieve({coordinates:{
-            longitude: position.coords.longitude,
-            latitude: position.coords.latitude
-          }});
-          this.setState({
-            currentPos: {
-              latitude: position.coords.latitude,
+            Geocoder.getFromLatLng(position.coords.latitude, position.coords.longitude).then(
+              json => {
+                var street_number = json.results[0].address_components[0];
+                var route = json.results[0].address_components[1];
+                this.props.retrieveAddress({address: street_number.long_name + " " + route.long_name})
+              },
+              error => {
+                alert(error);
+              }
+            );
+            this.props.coordinateRetrieve({coordinates:{
               longitude: position.coords.longitude,
-              latitudeDelta: LATITUDE_DELTA,
-              longitudeDelta: LONGITUDE_DELTA,
-            }
-          });
-        },
-      (error) => alert('Không thể xác định vị trí hiện tại'),
-      { timeout: 20000, maximumAge: 10000, DistanceFilter: 50 },
-      );
+              latitude: position.coords.latitude
+            }});
+            this.setState({
+              currentPos: {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+                latitudeDelta: LATITUDE_DELTA,
+                longitudeDelta: LONGITUDE_DELTA,
+              }
+            });
+            this.props.disableGetCurrentPosition();
+          },
+        (error) => alert('Không thể xác định vị trí hiện tại'),
+        { timeout: 20000, maximumAge: 10000, DistanceFilter: 50 },
+        );
+      }
       // this.watchID = navigator.geolocation.watchPosition(
       //   position => {
       //     this.setState({
@@ -325,7 +329,7 @@ class CustomMapView extends Component {
           >
             {this.props.chosenLocation.latitude && this.renderMarker()}
             {this.props.saviorMarkerSource.map(savior=>(
-                <MapView.Marker coordinate = {{longitude: savior.coordinates.long, latitude: savior.coordinates.lat}}>
+                <MapView.Marker coordinate = {{longitude: savior.coordinate.long, latitude: savior.coordinate.lat}}>
                   <View style={{flex:1}}>
                     <Image style={{width:30, height:30}} source={require('../image-res/reflector-vest64.png')}/>
                   </View>
@@ -339,6 +343,7 @@ class CustomMapView extends Component {
 
 function mapStateToProps(state){
   return {
+    autoUpdatePostion: state.addressReducer.autoUpdated,
     saviorMarkerSource: state.saviorListReducer.saviorsList,
     chosenLocation: state.coordinatesReducer.coordinates
   }

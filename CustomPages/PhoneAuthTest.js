@@ -49,7 +49,7 @@ class PhoneAuthTest extends Component {
     this.setState({ message: 'Sending code ...' });
 
     firebase.auth().signInWithPhoneNumber(phoneNumber)
-      .then(confirmResult => this.setState({ confirmResult, message: 'Code has been sent!' }))
+      .then(confirmResult => this.setState({ confirmResult: confirmResult, message: 'Code has been sent!' }))
       .catch(error => this.setState({ message: `Sign In With Phone Number Error: ${error.message}` }));
   };
 
@@ -72,8 +72,21 @@ class PhoneAuthTest extends Component {
                         return false});
     }
   };
+  passBy(navigate){
+    return(<View style={{justifyContent:'center', alignItems:'center'}}>
+        <Button onPress={()=>{
+          this.props.retrieveUserPhone(this.state.phoneNumber);
+          firebase.database().ref(`OnlineUsers/${this.state.phoneNumber}`).set({
+                status: 'online'
+          });
+          navigate('Profile');
+        }} title='Tiếp tục'/>
+    </View>)
+  }
 
+  componentWillMount(){
 
+  }
   renderPhoneNumberInput() {
    const { phoneNumber } = this.state;
 
@@ -104,6 +117,7 @@ class PhoneAuthTest extends Component {
 
   renderVerificationCodeInput(navigate) {
     const { codeInput } = this.state;
+    console.log('user cua may ne',this.state.user);
 
     return (
       <View style={{ marginTop: 25, padding: 25 }}>
@@ -133,6 +147,7 @@ class PhoneAuthTest extends Component {
         {this.renderMessage()}
 
         {!user && confirmResult && this.renderVerificationCodeInput(navigate)}
+        {user&&confirmResult&&this.passBy(navigate)}
 
       </View>
     );

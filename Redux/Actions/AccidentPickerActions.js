@@ -5,3 +5,10 @@ export function chooseAccident(data){
         }, 1);
   }
 }
+export function chooseRadius(data){
+  return (dispatch)=>{
+    setTimeout(()=>{
+      dispatch({type: "REQUEST_RADIUS", payload: data});
+    }, 1);
+  }
+}

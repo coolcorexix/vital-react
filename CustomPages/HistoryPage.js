@@ -7,6 +7,7 @@ import {DrawerNavigator} from 'react-navigation';
 import firebase from '../Firebase/config/firebase';
 import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/Ionicons';
+import FinishDialog from '../CustomComponents/FinishDialog';
 import RadioForm, {RadioButton, RadioButtonInput, RadioButtonLabel} from 'react-native-simple-radio-button';
 
 
@@ -59,8 +60,8 @@ export default class HistoryPage extends Component{
   render(){
     //        <UserInfoDisplay style={{height:'50%'}} name={this.props.usrName} ava={this.props.avaURL}/>
     return(
-      <View>
-      </View>
+      <FinishDialog>
+      </FinishDialog>
     )
   }
 }

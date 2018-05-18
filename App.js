@@ -88,6 +88,7 @@ export default class App extends Component {
       return prevGetStateForAction(action, state);
     }
 
+
     return (
       <Provider store={store}>
       <View style={{flex:1}}>

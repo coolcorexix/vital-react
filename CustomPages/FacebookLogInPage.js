@@ -24,7 +24,8 @@ class FacebookLogInPage extends Component<{}> {
     this.spinValue=new Animated.Value(0);
   }
   componentDidMount(){
-    this.spring().start();
+    firebase.auth().signOut();
+    this.spin();
 
   }
   translate(){
@@ -57,7 +58,7 @@ class FacebookLogInPage extends Component<{}> {
         duration: 4000,
         easing: Easing.linears
       }
-    ).start(() => this.spin())
+    ).start()
   }
   static navigationOptions = {
     header: null,
@@ -81,8 +82,7 @@ class FacebookLogInPage extends Component<{}> {
                             height:200,
                             resizeMode:'contain',
                             transform:[
-                              {rotate: spin},
-                              {scale: this.springValue}
+                              {rotate: spin}
                             ]}}
 
                             source={{uri: 'https://i.imgur.com/JKUZStg.png'}}>
