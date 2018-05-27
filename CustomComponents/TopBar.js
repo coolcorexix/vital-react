@@ -45,7 +45,7 @@ class TopBar extends Component{
     this.state={
       accidentRadio: false,
       otherDialog: false,
-      value: 0
+      value: 1
     }
   }
   translate(){
@@ -72,11 +72,14 @@ class TopBar extends Component{
           });
 
         }}>
+        <View style={{alignItems:'center'}}>
           <View style={{ flexDirection:'row', alignItems:'center', justifyContent: 'center'}}>
             <Text style={{fontFamily: 'akrobat_black', fontSize: 30, color:'#d35400'}}> V.</Text>
             <Text style={{fontFamily: 'akrobat_black', fontSize: 30, color:'#e67e22'}}> R. </Text>
             <Icon name={accident_icons[accident_icons[this.props.accident]?this.props.accident:'other']} size={25} color='#d35400'/>
           </View>
+          <Text style={{fontFamily:'helveticaneuelightitalic', color:"#d35400"}}>{(this.props.accident=="key")?"Mất khóa":(this.props.accident=="wheel")?"Hỏng xe":"Khác"}</Text>
+        </View>
         </TouchableOpacity>
         <View style={{flex: 2}}/>
         <TouchableOpacity style={{flex: 1,alignItems:'center', justifyContent: 'center'}} onPress={this.props.onRightPress}>
@@ -123,6 +126,9 @@ class TopBar extends Component{
                                     value: value,
                                     accidentRadio: false
                                   });
+                                  if (value==0){
+                                    this.props.popBikeDetail(true);
+                                  }
                                   if (value == 2){
                                     this.props.otherPopping();
                                   }

@@ -8,7 +8,7 @@ export default function userReducer(state={
     avaURL: " ",
     isRegistered: false
   },
-  accident: "wheel"
+  accident: "key"
 }, action){
   switch (action.type) {
     case "REQUEST_RADIUS":

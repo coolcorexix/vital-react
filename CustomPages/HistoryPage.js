@@ -9,7 +9,7 @@ import ActionButton from 'react-native-action-button';
 import Icon from 'react-native-vector-icons/Ionicons';
 import FinishDialog from '../CustomComponents/FinishDialog';
 import RadioForm, {RadioButton, RadioButtonInput, RadioButtonLabel} from 'react-native-simple-radio-button';
-
+import OnOffButton from '../CustomComponents/OnOffButton';
 
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
@@ -60,8 +60,10 @@ export default class HistoryPage extends Component{
   render(){
     //        <UserInfoDisplay style={{height:'50%'}} name={this.props.usrName} ava={this.props.avaURL}/>
     return(
-      <FinishDialog>
-      </FinishDialog>
+      <View style={{alignItems:'center', flex: 1, justifyContent:'center'}}>
+          <OnOffButton ref={ref=>this.onOff= ref}/>
+          <Button title='Press' onPress={()=>alert(this.onOff.state.selected)}/>
+      </View>
     )
   }
 }

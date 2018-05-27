@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Text, Image, TextInput, Button, StyleSheet, View, TouchableHighlight } from 'react-native';
+import {Text, Image, TextInput, Keyboard, Button, StyleSheet, View, TouchableHighlight } from 'react-native';
 import CustomButton from '../CustomComponents/CustomButton';
 import * as Actions from '../Redux/Actions/LogInAction';
 import firebase from '../Firebase/config/firebase';
@@ -91,7 +91,7 @@ componentDidMount(){
         </View>
         <View style={[styles.textInput, (this.state.havePhone)?{backgroundColor: '#27ae60'}:{backgroundColor:'#e74c3c'}]}>
           <Text style={styles.text}>Số điện thoại: </Text>
-          <TextInput style={[styles.text]} underlineColorAndroid='white' ref={component=>this.txtinpPhone=component}
+          <TextInput keyboardType="numeric" style={[styles.text]} underlineColorAndroid='white' ref={component=>this.txtinpPhone=component}
           onChangeText={value=>{
             if (value!='')
              this.setState({
@@ -113,6 +113,16 @@ componentDidMount(){
             name: this.txtinpName.value,
             phone: this.txtinpPhone.value
           });
+          Keyboard.dismiss();
+          if (this.txtinpPhone.value.trim()==""||!this.txtinpPhone.value)
+            {
+              this.txtinpPhone.value="";
+              this.setState({
+                havePhone: false
+              });
+              alert("Vui lòng nhập số điện thoại để việc cứu hộ dễ dàng hơn");
+              return;
+            }
           navigate('Main');
         }}>
           <View style={{flexDirection:'row', borderRadius: 5, backgroundColor:'#f1c40f', alignItems:'center', justifyContent:'center'}}>

@@ -11,18 +11,8 @@ import {
 export default class PendingDialog extends Component{
   constructor(){
     super();
-    this.fade1Value = new Animated.Value(1);
-    this.radiate1Value = new Animated.Value(0);
-    this.radiate2Value = new Animated.Value(0);
-    this.radiate3Value = new Animated.Value(0);
-    this.wait1Value = new Animated.Value(0);
-    this.wait2Value = new Animated.Value(0);
   }
   componentDidMount(){
-     this.radiate1();
-     this.wait1().start(()=>this.radiate2());
-     this.wait2().start(()=>this.radiate3());
-
   }
   wait1(){
     return Animated.timing(
@@ -71,19 +61,8 @@ export default class PendingDialog extends Component{
 
 
   render(){
-    const fade1 = this.radiate1Value.interpolate({
-      inputRange:[-0.1,1.1],
-      outputRange:[0.9,0.3]
-    });
-    const fade2 = this.radiate2Value.interpolate({
-      inputRange:[-0.1,1.1],
-      outputRange:[0.9,0.3]
-    });
-    const fade3 = this.radiate3Value.interpolate({
-      inputRange:[-0.1,1.1],
-      outputRange:[0.9,0.3]
-    });
-    console.log(this.radiate1Value.__getValue());
+
+
     return(
       <View style={{justifyContent:'center', alignItems:'center', backgroundColor:'#f1c40f', width:'100%', height:'100%', position: 'absolute'}}>
         <Image style={{width: '100%', height: '40%', resizeMode:'contain'}} source={{uri: 'https://media.giphy.com/media/zglFPxjeRbdm0/giphy.gif'}} />

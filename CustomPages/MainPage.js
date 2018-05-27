@@ -16,6 +16,7 @@ import * as MapViewActions from '../Redux/Actions/MapViewAction';
 import * as PoppingAction from '../Redux/Actions/poppingAction';
 import HideWithKeyboard from 'react-native-hide-with-keyboard';
 import RNGooglePlaces from 'react-native-google-places';
+import OnOffButton from '../CustomComponents/OnOffButton';
 
 
 
@@ -101,6 +102,7 @@ class MainPage extends Component{
       finished: false
     };
   }
+
   componentDidMount(){
     //console.log('fuck');
 
@@ -113,7 +115,7 @@ class MainPage extends Component{
     // });
   }
   openSearchModal(navigate){
-    if (this.state.locatingMethod==1)
+    if (this.locatingMethod.state.selected==1)
     {
       RNGooglePlaces.openAutocompleteModal({country: 'VN'}).then((place)=>{
         //console.log(place);
@@ -143,7 +145,8 @@ class MainPage extends Component{
         firebase.database().ref('OnlineUsers/' + this.props.usrId).update({status: 'online'});
         firebase.database().ref('OnlineSavior/'+ this.state.saviorData).update({status:'canceled'});
         this.setState({
-          enableCanceling: false
+          enableCanceling: false,
+          saviorData: ""
         })
       }} text="HỦY"/>
     )
@@ -208,6 +211,23 @@ class MainPage extends Component{
       </View>
     )
   }
+  renderBikeDialog(){
+    return (
+    <View style={styles.darkFade}>
+      <View style={styles.otherDialog}>
+        <Icon name='wrench' size={30} color='#e74c3c'/>
+        <TextInput style={{width:'80%'}}
+          onChangeText={value=>this.setState({
+            bikeValue: value
+          })}
+          ref={component=>this.bikeInput = component} placeholder='Mẫu xe của bạn là gì??..'/>
+        <Button title='Xong' onPress={()=>{
+          this.props.popBikeDetail(false);
+        }}/>
+      </View>
+    </View>
+    )
+  }
   renderSadlyDialog(){
     return(
       <View backgroundColor='#e74c3c' style={{justifyContent:'center', width:'100%', position:'absolute', height:'100%', elevation:12, alignItems:'center'}}>
@@ -268,18 +288,12 @@ class MainPage extends Component{
         <HideWithKeyboard style={{height:'20%'}}>
           <TopBar onRightPress={()=>{navigate('Profile')}} onPress={()=>{navigate('DrawerOpen')}}/>
         </HideWithKeyboard>
+
         <View style={{backgroundColor:'white', borderRadius: 5, elevation: 10, flexGrow: 1, marginTop:'17%', flexDirection:'row', alignItems:'center', justifyContent:'space-between', marginRight:'5%', height: '20%', marginLeft:'5%'}}>
-          <Image ref ={image=> this.image=image} onLayout={(event)=>{
-            this.image.measure( (fx, fy, width, height, px, py)=>{
-              this.setState({
-                actionButtonX: px,
-                actionButtonY: py
-              })
-            });
-          }} style={[styles.image,{marginLeft:10}]} source={require('../image-res/fearfulFace.png')}/>
+          <OnOffButton ref={ref=>this.locatingMethod = ref} />
           <TouchableOpacity ref={ref=>this.toucha = ref} style={{justifyContent:'center',  borderBottomColor: '#bbb',
-          borderBottomWidth: StyleSheet.hairlineWidth, alignItems: 'center', margin: '5%',
-           marginLeft:'10%', width:'80%'}} onPress={()=>this.openSearchModal(navigate)}>
+          borderBottomWidth: StyleSheet.hairlineWidth, alignItems: 'center', marginRight:'5%',
+            width:'70%'}} onPress={()=>this.openSearchModal(navigate)}>
             <Text style={{textAlign: 'center', fontSize:20, fontFamily:'helveticaneue'}}>{this.props.address}</Text>
           </TouchableOpacity>
         </View>
@@ -287,44 +301,18 @@ class MainPage extends Component{
         {!this.state.enableCanceling && this.renderFireRequestButton(navigate)}
         {this.state.enableCanceling && this.renderCancelButton()}
 
-        <ActionButton position='left' size={40} offsetX={this.state.actionButtonX} offsetY={this.state.actionButtonY} style={{elevation: 10, flex:1, position:'absolute'}} verticalOrientation="down" buttonColor="#e74c3c"
-        renderIcon ={(active)=>{
-          if (this.state.locatingMethod == 1)
-          return (
-            <Icon color='#fff' size={15} name='font'/>
-          )
-          else return(
-            <Icon color='#fff' size={15} name='map-marker'/>
-          )
-        }}>
-          <ActionButton.Item buttonColor='#ffffff' title="Chọn từ bản đồ" onPress={() => {
-            //this.props.chooseAccident({accident: 'key'});
-            //console.log(this.props.accident);
-            this.setState({
-              locatingMethod: 0
-            })
-          }}>
-            <Icon size={15} name='map-marker'/>
-          </ActionButton.Item>
-          <ActionButton.Item buttonColor='#ffffff' title="Nhập địa chỉ" onPress={() => {
-            //this.props.chooseAccident({accident: 'wheel'});
-            //console.log(this.props.accident);
-            this.setState({
-              locatingMethod: 1
-            })
-          }}>
-            <Icon size={15} name='font'/>
-          </ActionButton.Item>
-        </ActionButton>
+
         {this.state.pending&&this.renderPendingDialog()}
         {this.state.accepted&&this.renderAcceptDialog()}
         {this.state.none&&this.renderSadlyDialog()}
         {this.props.otherDialog&&this.renderOtherDialog()}
         {this.state.finished&&this.renderFinishDialog()}
+        {this.props.bikeDialog&&this.renderBikeDialog()}
       </View>
     )
   }
 }
+
 function sendRequestDetailToDb(data, id, navigate, func, obj){
   var requestCollection = firebase.database().ref().child("RequestDetails");
   requestCollection.push().set(data);
@@ -384,7 +372,9 @@ function sendRequestDetailToDb(data, id, navigate, func, obj){
           {
             obj.setState({
               accepted: false,
-              finished: true
+              finished: true,
+              saviorData: ''
+
             })
           }
         });
@@ -396,6 +386,7 @@ function sendRequestDetailToDb(data, id, navigate, func, obj){
 function mapStateToProps(state){
   return{
     otherDialog: state.dialogReducer.otherDialog,
+    bikeDialog: state.dialogReducer.bikeDialog,
     onlState: state.userReducer.isOnline,
     accident: state.userReducer.accident,
     usrId: state.userReducer.info.id,

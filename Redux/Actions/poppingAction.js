@@ -5,6 +5,13 @@ export function otherPopping(){
         }, 1);
   }
 }
+export function popBikeDetail(data){
+  return (dispatch)=>{
+    setTimeout(() => {
+            dispatch({type: "BIKE_POPPING", payload: data});
+        }, 1);
+  }
+}
 export function otherDismiss(){
   return (dispatch)=>{
     setTimeout(() => {

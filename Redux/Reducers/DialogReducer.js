@@ -1,7 +1,14 @@
 export default function dialogReducer(state={
-  otherDialog: false
+  otherDialog: false,
+  bikeDialog: false
 }, action){
   switch (action.type) {
+    case "BIKE_POPPING":
+    {
+      state.bikeDialog = action.payload;
+      return state;
+    }
+      break;
     case "OTHER_POPPING":
     {
       state.otherDialog = true;
