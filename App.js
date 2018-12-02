@@ -72,7 +72,7 @@ export default class App extends Component {
         SideBar: {screen: SideBar}
 
     },{
-        initialRouteName: "Welcome",
+        initialRouteName: "Main",
         navigationOptions: ({navigation}) => ({
           header: null})
       });

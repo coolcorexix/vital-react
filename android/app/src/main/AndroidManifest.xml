@@ -25,7 +25,7 @@
         </receiver>
         <meta-data
          android:name="com.google.android.geo.API_KEY"
-         android:value="AIzaSyCWlhjgh6jLAvvbWzm6_d09MHbNNF6br9g"/>
+         android:value="AIzaSyClo4z9Mx7tl5D-z4vEZ6f-86m3WtOFeeY"/>
          <activity
            android:name=".MainActivity"
            android:label="@string/app_name"

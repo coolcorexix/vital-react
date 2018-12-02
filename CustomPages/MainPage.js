@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Text, Image, TextInput, Button, StyleSheet, View, TouchableHighlight, TouchableOpacity, Dimensions, Animated, Easing} from 'react-native';
+import {Text, Image, PermissionsAndroid, TextInput, Button, StyleSheet, View, TouchableHighlight, TouchableOpacity, Dimensions, Animated, Easing} from 'react-native';
 import CustomMapView from '../CustomComponents/CustomMapView';
 import CustomButton from '../CustomComponents/CustomButton';
 import PendingDialog from '../CustomComponents/PendingDialog';
@@ -105,7 +105,7 @@ class MainPage extends Component{
 
   componentDidMount(){
     //console.log('fuck');
-
+    this._askForLocationServices();
     //firebase.database().ref(`OnlineUsers/${this.props.usrId}/AvailableSaviors`)
     // var requestCollection = firebase.database().ref().child("RequestDetails");
     // requestCollection.on('child_added',(snapshot, previousChildName)=>{
@@ -114,6 +114,17 @@ class MainPage extends Component{
     //   console.log('previousChildName', previousChildName);
     // });
   }
+
+  _askForLocationServices() {
+    PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION, {
+      'title': 'question',
+      'message': 'gimme that location',
+    }).then((granted) => {
+      console.log('granted', granted);
+      // always returns never_ask_again
+    })
+  }
+
   openSearchModal(navigate){
     if (this.locatingMethod.state.selected==1)
     {
