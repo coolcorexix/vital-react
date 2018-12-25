@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Text, Image, TextInput, Keyboard, Button, StyleSheet, View, TouchableHighlight } from 'react-native';
+import {Text, BackHandler, TextInput, Keyboard, Button, StyleSheet, View, TouchableHighlight } from 'react-native';
 import CustomButton from '../CustomComponents/CustomButton';
 import * as Actions from '../Redux/Actions/LogInAction';
 import firebase from '../Firebase/config/firebase';
@@ -59,16 +59,23 @@ class ProfilePage extends Component{
       })
 
   }
-componentDidMount(){
-  this.txtinpName.value = this.props.usrName;
-  this.txtinpPhone.value = this.props.usrPhone;
-}
+
+  handleBackPress = () => true;
+
+  componentDidMount(){
+    this.txtinpName.value = this.props.usrName;
+    // this.txtinpPhone.value = this.props.usrPhone;
+    BackHandler.addEventListener('hardwareBackPress',this.handleBackPress);
+  }
   static navigationOptions = {
     header: null
   };
 
+  componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress',this.handleBackPress);
+  }
 
-  render(){
+    render(){
     const {navigate} = this.props.navigation;
     return(
       <View style={styles.container}>
@@ -89,7 +96,7 @@ componentDidMount(){
              this.txtinpName.value=value;
           }}/>
         </View>
-        <View style={[styles.textInput, (this.state.havePhone)?{backgroundColor: '#27ae60'}:{backgroundColor:'#e74c3c'}]}>
+        <View style={[styles.textInput, (this.state.havePhone || this.props.usrPhone && !this.state.isDirtyPhone)?{backgroundColor: '#27ae60'}:{backgroundColor:'#e74c3c'}]}>
           <Text style={styles.text}>Số điện thoại: </Text>
           <TextInput keyboardType="numeric" style={[styles.text]} underlineColorAndroid='white' ref={component=>this.txtinpPhone=component}
           onChangeText={value=>{
@@ -99,8 +106,11 @@ componentDidMount(){
              });
              else this.setState({
                havePhone: false
-             })
+             });
             this.txtinpPhone.value=value;
+            this.setState({
+                isDirtyPhone: true,
+            })
          }}
           defaultValue={this.props.usrPhone}/>
         </View>
@@ -114,7 +124,7 @@ componentDidMount(){
             phone: this.txtinpPhone.value
           });
           Keyboard.dismiss();
-          if (this.txtinpPhone.value.trim()==""||!this.txtinpPhone.value)
+          if (!this.txtinpPhone.value || this.txtinpPhone.value.trim()=="")
             {
               this.txtinpPhone.value="";
               this.setState({
